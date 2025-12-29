@@ -1,0 +1,23 @@
+# --- Android / Gradle ---
+.gradle/
+build/
+**/build/
+
+# --- Local configuration ---
+local.properties
+
+# --- Android Studio / IntelliJ ---
+.idea/
+*.iml
+
+# --- Native / CMake ---
+.externalNativeBuild/
+.cxx/
+
+# --- Generated media ---
+captures/
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
