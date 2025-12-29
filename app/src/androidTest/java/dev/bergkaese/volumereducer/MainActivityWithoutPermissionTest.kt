@@ -1,0 +1,53 @@
+package dev.bergkaese.volumereducer
+
+import android.util.Log
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.Until
+
+import org.junit.Test
+import org.junit.runner.RunWith
+
+import org.junit.Before
+import org.junit.Rule
+
+/**
+ * Instrumented test, which will execute on an Android device.
+ *
+ * See [testing documentation](http://d.android.com/tools/testing).
+ */
+@RunWith(AndroidJUnit4::class)
+class MainActivityWithoutPermissionTest {
+
+    @get:Rule
+    val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+    @Before
+    fun clickDenyButton(){
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        val denyPermissionButton = device.wait(
+            Until.findObject(By.res("com.android.permissioncontroller:id/permission_deny_button")),
+            2000
+        )
+
+        denyPermissionButton?.click()
+        Log.d("ClickDenyButton", "Wait for Idle")
+        composeTestRule.waitForIdle()
+        Log.d("ClickDenyButton", "starting test...")
+    }
+
+    @Test
+    fun testThatSliderIsNotVisibleIfPermissionsAreNotGranted(){
+        composeTestRule.onNodeWithTag("slider_volume").assertDoesNotExist()
+    }
+
+    @Test
+    fun testThatCloseButtonIsVisibleIfPermissionsAreNotGranted(){
+        composeTestRule.onNodeWithTag("btn_close").assertIsDisplayed()
+    }
+}

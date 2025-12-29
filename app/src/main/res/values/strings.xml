@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">VolumeReducer</string>
+    <string name="volume">Volume</string>
+    <string name="stop">Close</string>
+    <string name="volume_service">Volume Reducer\n</string>
+    <string name="start_volume_server">Start Volume Service</string>
+    <string name="is_running">Service is running.</string>
+</resources>
