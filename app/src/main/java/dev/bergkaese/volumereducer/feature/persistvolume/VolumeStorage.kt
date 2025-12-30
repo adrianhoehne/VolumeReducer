@@ -11,8 +11,8 @@ interface VolumeStorage {
     fun getPersistedVolume(): VolumeFactor
 }
 
-private const val PREFERENCE_NAME = "current_volume"
-private const val PREFERENCE_KEY = "key_volume"
+const val PREFERENCE_NAME = "current_volume"
+const val PREFERENCE_KEY = "key_volume"
 
 class VolumeStorageBySharedPrefs(val context: Context): VolumeStorage {
     override fun persistCurrentVolume(volumeFactor: VolumeFactor) {
