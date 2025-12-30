@@ -41,7 +41,11 @@ jobs:
             -no-audio
             -no-boot-anim
             -gpu swiftshader_indirect
+            -accel off
+          emulator-timeout: 600
           script: |
+            adb wait-for-device
+            adb shell getprop sys.boot_completed true
             ./gradlew createDebugCoverageReport
 
       - name: Upload Android Coverage Report
