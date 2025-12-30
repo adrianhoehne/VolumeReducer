@@ -23,6 +23,7 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
+        continue-on-error: true
 
       - name: Run Unit Tests
         run: ./gradlew testDebugUnitTest
