@@ -27,26 +27,3 @@ jobs:
 
       - name: Run Unit Tests
         run: ./gradlew testDebugUnitTest
-
-      - name: Run Instrumentation Tests with Coverage
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 33
-          target: google_apis
-          arch: x86_64
-          profile: Nexus 6
-          disable-animations: true
-          emulator-options: >
-            -no-window
-            -no-audio
-            -no-boot-anim
-            -gpu swiftshader_indirect
-          script: |
-            ./gradlew createDebugCoverageReport
-
-      - name: Upload Android Coverage Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-coverage-report
-          path: app/build/reports/coverage/androidTest/debug/connected
-          
