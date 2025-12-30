@@ -35,7 +35,7 @@ class MainActivityTest {
     }
 
     val fakeStorage = object : VolumeStorage {
-        var _persistedVolume = 1.0f
+        private var _persistedVolume = 1.0f
         override fun persistCurrentVolume(volumeFactor: VolumeFactor) {
             _persistedVolume = volumeFactor
         }
@@ -43,26 +43,39 @@ class MainActivityTest {
     }
 
     lateinit var context: Application
+    lateinit var testViewModel: AppModel
 
 
     @Before
     fun before(){
         context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
-        val testViewModel = AppModel(AudioController(fakeVolumeEqualizer), fakeStorage)
-        composeTestRule.setContent {
-            MainScreen(
-                isGranted = true,
-                volumeIdentifier = "Volume",
-                currentVolume = testViewModel.currentVolume,
-                onVolumeChange = { factor -> testViewModel.setVolume(factor) },
-                finishButtonText = "Stop",
-                onFinish = { }
-            )
-        }
+        testViewModel = AppModel(AudioController(fakeVolumeEqualizer), fakeStorage)
+    }
+
+    @Test
+    fun testThatCloseButtonIsVisibleIfPermissionsAreNotGranted(){
+        insertMainScreen(false)
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("btn:close").assertDoesNotExist()
+    }
+
+    @Test
+    fun testThatSliderIsNotAvailableIfPermissionsAreNotGranted(){
+        insertMainScreen(false)
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("slider_volume").assertDoesNotExist()
+    }
+
+    @Test
+    fun testThatSliderIsVisibleWhenPermissionsAreGranted(){
+        insertMainScreen(true)
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("slider_volume").assertExists()
     }
 
     @Test
     fun testThatSliderReducesTheVolume(){
+        insertMainScreen(true)
         composeTestRule.waitUntil(1000){
             composeTestRule.onAllNodesWithTag("slider_volume").fetchSemanticsNodes().isNotEmpty()
         }
@@ -76,6 +89,19 @@ class MainActivityTest {
         Log.d("BandVolumes", "$bandVolumes")
         bandVolumes.forEach {
             assertEquals(-1000, it.value)
+        }
+    }
+
+    fun insertMainScreen(isGranted: Boolean){
+        composeTestRule.setContent {
+            MainScreen(
+                isGranted = isGranted,
+                volumeIdentifier = "Volume",
+                currentVolume = testViewModel.currentVolume,
+                onVolumeChange = { factor -> testViewModel.setVolume(factor) },
+                onFinish = { },
+                finishButtonText = "Stop",
+            )
         }
     }
 }

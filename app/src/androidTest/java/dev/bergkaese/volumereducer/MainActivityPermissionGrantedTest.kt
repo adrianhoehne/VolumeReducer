@@ -17,7 +17,7 @@ class MainActivityPermissionGrantedTest {
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
     @Before
-    fun clickDenyButton(){
+    fun clickAllowButton(){
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         val allowPermissionButton = device.wait(
             Until.findObject(By.res("com.android.permissioncontroller:id/permission_allow_button")),
@@ -31,12 +31,8 @@ class MainActivityPermissionGrantedTest {
     }
 
     @Test
-    fun testThatSliderIsNotVisibleIfPermissionsAreNotGranted(){
+    fun testThatSliderIsVisibleAfterPermissionsAreGranted(){
         composeTestRule.onNodeWithTag("slider_volume").assertIsDisplayed()
-    }
-
-    @Test
-    fun testThatCloseButtonIsVisibleIfPermissionsAreNotGranted(){
         composeTestRule.onNodeWithTag("btn_close").assertIsDisplayed()
     }
 }
