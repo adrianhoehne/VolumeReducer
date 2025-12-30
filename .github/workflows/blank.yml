@@ -25,9 +25,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         continue-on-error: true
 
-      - name: Run Unit Tests
-        run: ./gradlew testDebugUnitTest
-
       - name: Enable KVM group perms for Android Testing
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -50,6 +47,9 @@ jobs:
             ./gradlew connectedCheck
             ./gradlew createDebugCoverageReport
 
+      - name: Run Unit Tests
+        run: ./gradlew testDebugUnitTest
+        
       - name: Upload Android Coverage Report
         uses: actions/upload-artifact@v4
         with:
