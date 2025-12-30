@@ -37,7 +37,7 @@ jobs:
       - name: Run Instrumentation Tests with Coverage
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 33
+          api-level: 26
           arch: x86_64
           disable-animations: true
           emulator-options: >
@@ -46,7 +46,6 @@ jobs:
             -no-boot-anim
             -gpu swiftshader_indirect
             -accel off
-          emulator-timeout: 600
           script: |
             ./gradlew connectedCheck
             ./gradlew createDebugCoverageReport
