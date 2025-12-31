@@ -43,3 +43,16 @@ jobs:
 
       - name: Run Unit Tests
         run: ./gradlew testDebugUnitTest
+
+      - name: Prepare Coverage for GH Pages
+        if: github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p public/coverage
+          cp -r app/build/reports/coverage/androidTest/debug/connected/* public/coverage/
+
+      - name: Deploy Coverage
+        if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: public
