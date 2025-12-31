@@ -1,5 +1,7 @@
 # VolumeReducer
-
+[![Android Tests](https://github.com/adrianhoehne/VolumeReducer/actions/workflows/tests.yml/badge.svg?branch=main)](
+https://github.com/adrianhoehne/VolumeReducer/actions/workflows/tests.yml
+)
 ## What does it
 It reduces the overall volume of the device.
 
