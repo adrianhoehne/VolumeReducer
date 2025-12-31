@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MainActivity.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">dev.bergkaese.volumereducer</a> &gt; <span class="el_source">MainActivity.kt</span></div><h1>MainActivity.kt</h1><pre class="source lang-java linenums">package dev.bergkaese.volumereducer
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.setContent
+import androidx.activity.viewModels
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewmodel.viewModelFactory
+import dev.bergkaese.volumereducer.feature.controlvolume.AudioController
+import dev.bergkaese.volumereducer.feature.handlepermissions.PermissionService
+import dev.bergkaese.volumereducer.feature.handlepermissions.PermissionServiceImpl
+import dev.bergkaese.volumereducer.feature.persistvolume.VolumeStorageBySharedPrefs
+import dev.bergkaese.volumereducer.feature.stayactive.StayActiveServiceController
+import dev.bergkaese.volumereducer.feature.stayactive.StayActiveServiceControllerImpl
+import dev.bergkaese.volumereducer.ui.AppModel
+import dev.bergkaese.volumereducer.ui.MainScreen
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+<span class="fc" id="L25">class MainActivity : ComponentActivity(),</span>
+<span class="fc" id="L26">    StayActiveServiceController by StayActiveServiceControllerImpl(),</span>
+<span class="fc" id="L27">    PermissionService by PermissionServiceImpl(){</span>
+<span class="fc" id="L28">    private val viewModel by viewModels&lt;AppModel&gt;(){</span>
+<span class="fc" id="L29">        viewModelFactory {</span>
+<span class="fc" id="L30">            addInitializer(AppModel::class) {</span>
+<span class="fc" id="L31">                AppModel(AudioController(), VolumeStorageBySharedPrefs(applicationContext))</span>
+            }
+<span class="fc" id="L33">        }</span>
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+<span class="fc" id="L37">        super.onCreate(savedInstanceState)</span>
+<span class="fc" id="L38">        setContent {</span>
+<span class="fc" id="L39">            BackHandler(enabled = true) {</span>
+<span class="nc" id="L40">                moveTaskToBack(true)</span>
+<span class="nc" id="L41">            }</span>
+<span class="fc" id="L42">            val isGranted by viewModel.permissionsGranted.collectAsState()</span>
+<span class="fc" id="L43">            MainScreen(isGranted,</span>
+<span class="fc" id="L44">                getString(R.string.volume),</span>
+<span class="fc" id="L45">                viewModel.currentVolume,</span>
+<span class="pc" id="L46">                { factor -&gt; viewModel.setVolume(factor) },</span>
+<span class="fc" id="L47">                getString(R.string.stop),</span>
+<span class="pc" id="L48">                { finishAndRemoveTask() })</span>
+        }
+<span class="fc" id="L50">        requestPermissions()</span>
+<span class="fc" id="L51">    }</span>
+
+    private fun requestPermissions() {
+<span class="fc" id="L54">        lifecycleScope.launch {</span>
+<span class="fc" id="L55">            repeatOnLifecycle(Lifecycle.State.STARTED) {</span>
+<span class="pc" id="L56">                getPermissionState().collect { granted -&gt;</span>
+<span class="fc" id="L57">                    viewModel.permissionsGranted.update { granted }</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">                    if (granted) {</span>
+<span class="fc" id="L59">                        startStayActiveService(this@MainActivity)</span>
+                    } else {
+<span class="fc" id="L61">                        shutdownStayActiveService(this@MainActivity)</span>
+                    }
+<span class="fc" id="L63">                }</span>
+            }
+<span class="fc" id="L65">        }</span>
+<span class="fc" id="L66">        initPermissionService(this)</span>
+<span class="fc" id="L67">    }</span>
+
+    override fun onDestroy() {
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">        if(isChangingConfigurations.not()){</span>
+<span class="fc" id="L71">            shutdownStayActiveService(this)</span>
+        }
+<span class="fc" id="L73">        super.onDestroy()</span>
+<span class="fc" id="L74">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span>Generated by the Android Gradle plugin 8.13.2</div></body></html>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PermissionService.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">dev.bergkaese.volumereducer.feature.handlepermissions</a> &gt; <span class="el_source">PermissionService.kt</span></div><h1>PermissionService.kt</h1><pre class="source lang-java linenums">package dev.bergkaese.volumereducer.feature.handlepermissions
+
+import android.Manifest
+import android.app.Activity
+import android.content.pm.PackageManager
+import android.os.Build
+import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+
+interface PermissionService {
+    fun initPermissionService(activity: ComponentActivity)
+    fun getPermissionState(): StateFlow&lt;Boolean&gt;
+    fun areAllPermissionsGranted(): Boolean
+}
+
+<span class="fc" id="L23">class PermissionServiceImpl() : PermissionService {</span>
+    private lateinit var permissionLauncher: ActivityResultLauncher&lt;Array&lt;String&gt;&gt;
+    private val permissions: List&lt;String&gt;
+<span class="fc" id="L26">    private val _permissionState = MutableStateFlow(false)</span>
+
+<span class="fc" id="L28">    init {</span>
+<span class="fc" id="L29">        val permissionsList = mutableListOf&lt;String&gt;()</span>
+<span class="pc bpc" id="L30" title="1 of 2 branches missed.">        if (Build.VERSION.SDK_INT &gt;= 33) {</span>
+<span class="fc" id="L31">            permissionsList += Manifest.permission.POST_NOTIFICATIONS</span>
+        }
+
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">        if (Build.VERSION.SDK_INT &gt;= 34) {</span>
+<span class="fc" id="L35">            permissionsList += Manifest.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK</span>
+        }
+<span class="fc" id="L37">        permissions = permissionsList.toList()</span>
+<span class="fc" id="L38">    }</span>
+
+    override fun getPermissionState(): StateFlow&lt;Boolean&gt; {
+<span class="fc" id="L41">        return _permissionState.asStateFlow()</span>
+    }
+
+    override fun areAllPermissionsGranted(): Boolean {
+<span class="nc" id="L45">        return _permissionState.value</span>
+    }
+
+    override fun initPermissionService(
+        activity: ComponentActivity,
+    ) {
+<span class="fc" id="L51">        registerForResult(activity)</span>
+<span class="fc" id="L52">        updatePermissions(activity)</span>
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">        if(_permissionState.value.not()){</span>
+<span class="fc" id="L54">            requestPermissions()</span>
+        }
+<span class="fc" id="L56">    }</span>
+
+    private fun updatePermissions(activity: ComponentActivity) {
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">        if (_permissionState.value.not()) {</span>
+<span class="fc" id="L60">            _permissionState.update { hasAllPermissions(activity) }</span>
+        }
+<span class="fc" id="L62">    }</span>
+
+    private fun registerForResult(activity: ComponentActivity) {
+<span class="fc" id="L65">        permissionLauncher = activity.registerForActivityResult(</span>
+<span class="fc" id="L66">            ActivityResultContracts.RequestMultiplePermissions()</span>
+<span class="fc" id="L67">        ) { result -&gt; handleResult(result) }</span>
+<span class="fc" id="L68">    }</span>
+
+    private fun handleResult(
+        result: Map&lt;String, @JvmSuppressWildcards Boolean&gt;,
+    ) {
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">        val denied = result.filter { !it.value }.keys</span>
+<span class="pc bpc" id="L74" title="2 of 4 branches missed.">        if (denied.isNotEmpty()) {</span>
+<span class="nc" id="L75">            Log.d(&quot;PermissionHandler&quot;, &quot;Permission denied: $denied&quot;)</span>
+<span class="nc" id="L76">            _permissionState.update { false }</span>
+        } else {
+<span class="fc" id="L78">            Log.d(&quot;PermissionHandler&quot;, &quot;Permission granted: $result&quot;)</span>
+<span class="fc" id="L79">            _permissionState.update { true }</span>
+        }
+<span class="fc" id="L81">    }</span>
+
+    private fun hasAllPermissions(activity: Activity): Boolean {
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">        if (_permissionState.value) {</span>
+<span class="nc" id="L85">            return true</span>
+        }
+<span class="fc" id="L87">        return permissions.all {</span>
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">            ContextCompat.checkSelfPermission(</span>
+<span class="fc" id="L89">                activity.applicationContext,</span>
+<span class="fc" id="L90">                it</span>
+<span class="fc" id="L91">            ) == PackageManager.PERMISSION_GRANTED</span>
+        }
+    }
+    private fun requestPermissions() {
+<span class="fc" id="L95">        permissionLauncher.launch(permissions.toTypedArray())</span>
+<span class="fc" id="L96">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span>Generated by the Android Gradle plugin 8.13.2</div></body></html>
