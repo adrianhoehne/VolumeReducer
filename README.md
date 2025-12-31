@@ -16,4 +16,4 @@ It uses the built-in equalizer and reduces the volume by reducing the bands of t
 VolumeReducer won't work on every device because device-specific implementations may ignore, override or disable the equalizer that is used. Beside of that, using the global option in the systems equalizer is deprecated.
 
 ## Screenshot
-![Screenshot](screenshot.jpg)
+![Screenshot](screenshot.jpeg)
