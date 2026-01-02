@@ -2,6 +2,9 @@
 [![Android Tests](https://github.com/adrianhoehne/VolumeReducer/actions/workflows/tests.yml/badge.svg?branch=main)](
 https://github.com/adrianhoehne/VolumeReducer/actions/workflows/tests.yml
 )
+
+<a href="https://www.buymeacoffee.com/adrianhoehne" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+
 ## What does it
 It reduces the overall volume of the device.
 
